@@ -1,13 +1,25 @@
 import { useRef } from "react";
 import { useState,useEffect } from "react";
-import useForm from "./UseForm";
-
 
 const FORM_ENDPOINT = "https://frontend-take-home.fetchrewards.com/form"
 const Form = () => {
-  const formElement = useRef(null);
   const [val, setVal] = useState([])
   const [state, setState] = useState([])
+  const [message, setMessage] = useState("");
+  const [formData, updateFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    occupation: "",
+    state: ""
+  });
+ 
+  const handleChange = (e) => {
+    updateFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   //fetching occupation details in select field
   useEffect(() => {
@@ -25,27 +37,30 @@ const Form = () => {
       .catch( error => console.log(error))                                             
   },[])
 
-  //result status handling
-  const { handleSubmit, status, message } = useForm({
-    form: formElement.current,
-  });
-
-  if (status === "success") {
-    return (
-      <>
-        <div className="text-2xl">Thank you!</div>
-        <div className="text-md">{message}</div>
-      </>
-    );
-  }
-
-  if (status === "error") {
-    return (
-      <>
-        <div className="text-2xl">Something bad happened!</div>
-        <div className="text-md">{message}</div>
-      </>
-    );
+  //console.log(formData);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    fetch(`https://frontend-take-home.fetchrewards.com/form`, {
+        method: "POST",
+        headers: {
+          'Accept': "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+        .then ((response)=>console.log(response))
+        .then((response) => {
+          console.log('Success:', formData);
+          document.getElementById("registerform").reset();
+          if (response.status === 200) {
+            setMessage("User created successfully");
+          } else {
+            setMessage("Some error occured");
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        })
   }
 
   return (
@@ -54,7 +69,7 @@ const Form = () => {
       onSubmit={handleSubmit}
       method="POST"
       target="_blank"
-      ref={formElement}
+      id="registerform"
     >
       {/* name input field */}
       <div className="mb-3 pt-0">
@@ -62,6 +77,7 @@ const Form = () => {
           type="text"
           placeholder="Name"
           name="name"
+          onChange={handleChange}
           className="px-3 py-3 placeholder-gray-400 text-gray-600 relative bg-white bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
           required
         />
@@ -72,6 +88,7 @@ const Form = () => {
           type="email"
           placeholder="Email"
           name="email"
+          onChange={handleChange}
           className="px-3 py-3 placeholder-gray-400 text-gray-600 relative bg-white bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
           required
         />
@@ -82,6 +99,7 @@ const Form = () => {
           type="password"
           placeholder="Password"
           name="password"
+          onChange={handleChange}
           className="px-3 py-3 placeholder-gray-400 text-gray-600 relative bg-white bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
           required
         />
@@ -92,6 +110,7 @@ const Form = () => {
             type="select" 
             name="occupation"
             placeholder="occupation"
+            onChange={handleChange}
             className="px-3 py-3 placeholder-gray-400 text-gray-600 relative bg-white bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
             required
         >
@@ -103,9 +122,9 @@ const Form = () => {
       {/* States input field */}
       <div className="mb-3 pt-0">
         <select 
-            name="States"
             name="state"
             placeholder="state"
+            onChange={handleChange}
             className="px-3 py-3 placeholder-gray-400 text-gray-600 relative bg-white bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
             required
         >
@@ -115,16 +134,15 @@ const Form = () => {
         </select>
       </div>
       {/* Submit button field */}
-      {status !== "loading" && (
+     
         <div className="mb-3 pt-0">
           <button
             className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-            type="submit"
-          >
+            type="submit">
             Submit
           </button>
         </div>
-      )}
+        <div className="message">{message ? <p>{message}</p> : null}</div>
     </form>
   );
 };
