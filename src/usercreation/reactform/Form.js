@@ -1,11 +1,13 @@
 import { useRef } from "react";
 import { useState,useEffect } from "react";
+import useForm from "./useForm";
 
 const FORM_ENDPOINT = "https://frontend-take-home.fetchrewards.com/form"
 const Form = () => {
+
   const [val, setVal] = useState([])
   const [state, setState] = useState([])
-  const [message, setMessage] = useState("");
+  //const [message, setMessage] = useState("");
   const [formData, updateFormData] = useState({
     name: "",
     email: "",
@@ -14,13 +16,6 @@ const Form = () => {
     state: ""
   });
  
-  const handleChange = (e) => {
-    updateFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
   //fetching occupation details in select field
   useEffect(() => {
       fetch(FORM_ENDPOINT)
@@ -38,30 +33,8 @@ const Form = () => {
   },[])
 
   //console.log(formData);
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    fetch(`https://frontend-take-home.fetchrewards.com/form`, {
-        method: "POST",
-        headers: {
-          'Accept': "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      })
-        .then ((response)=>console.log(response))
-        .then((response) => {
-          console.log('Success:', formData);
-          document.getElementById("registerform").reset();
-          if (response.status === 200) {
-            setMessage("User created successfully");
-          } else {
-            setMessage("Some error occured");
-          }
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        })
-  }
+ 
+  const { handleChange,handleSubmit} = useForm(formData,updateFormData);
 
   return (
     <form
@@ -78,7 +51,7 @@ const Form = () => {
           placeholder="Name"
           name="name"
           onChange={handleChange}
-          className="px-3 py-3 placeholder-gray-400 text-gray-600 relative bg-white bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
+          className="px-3 py-3  text-gray-600 relative bg-white bg-white rounded text-sm border-0  shadow outline-none focus:outline-none focus:ring w-full"
           required
         />
       </div>
@@ -142,7 +115,7 @@ const Form = () => {
             Submit
           </button>
         </div>
-        <div className="message">{message ? <p>{message}</p> : null}</div>
+        {/* <div className="message">{message ? <p>{message}</p> : null}</div> */}
     </form>
   );
 };
