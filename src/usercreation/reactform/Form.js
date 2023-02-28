@@ -1,13 +1,13 @@
-import { useRef } from "react";
+
 import { useState,useEffect } from "react";
 import useForm from "./useForm";
 
 const FORM_ENDPOINT = "https://frontend-take-home.fetchrewards.com/form"
-const Form = () => {
+const Form = (submitstatus) => {
 
   const [val, setVal] = useState([])
   const [state, setState] = useState([])
-  //const [message, setMessage] = useState("");
+ 
   const [formData, updateFormData] = useState({
     name: "",
     email: "",
@@ -35,6 +35,24 @@ const Form = () => {
   //console.log(formData);
  
   const { handleChange,handleSubmit} = useForm(formData,updateFormData);
+
+  // if (submitstatus === "success") {
+  //   return (
+  //     <>
+  //       alert("Thank you");
+  //       <div className="text-2xl">Thank you!</div>
+  //     </>
+  //   );
+  // }
+
+  // if (submitstatus === "error") {
+  //   return (
+  //     <>
+  //       <div className="text-2xl">Something bad happened!</div>
+  //     </>
+  //   );
+  // }
+
 
   return (
     <form
@@ -115,7 +133,11 @@ const Form = () => {
             Submit
           </button>
         </div>
-        {/* <div className="message">{message ? <p>{message}</p> : null}</div> */}
+        {/* {(submitstatus === "ok" )? <div className="success">Form submitted successfully</div> : 
+         <div className="error">Please submit form</div>
+          
+        } */}
+        <div className={submitstatus}>{submitstatus ? <p>Plase submit </p> : <p>Submitted</p>}</div>
     </form>
   );
 };

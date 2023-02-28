@@ -1,7 +1,8 @@
-import { React } from "react";
+import { React,useState } from "react";
 
 const useForm = (formData,updateFormData) => {
-
+    //const [message, setMessage] = useState("");
+    const [submitstatus, setsubmitstatus] = useState();
     const handleChange = (e) => {
         updateFormData({
           ...formData,
@@ -22,17 +23,18 @@ const useForm = (formData,updateFormData) => {
             .then((response) => {
               console.log('Success:', formData);
               document.getElementById("registerform").reset();
-            //   if (response.status === 200) {
-            //     setMessage("User created successfully");
-            //   } else {
-            //     setMessage("Some error occured");
-            //   }
+              if (response.status !== 200) {
+                throw new Error(response.statusText);
+                //setMessage("User created successfully");
+              }
+              return response.json(); 
             })
-            .catch((error) => {
-              console.error('Error:', error);
-            })
-      };
-    return{handleChange ,handleSubmit};
+            .then(() => setsubmitstatus("ok"))
+            .catch((err) => setsubmitstatus("error", err.toString()));
+    };
+    
+    return{handleChange ,handleSubmit,submitstatus}     
+        
 }
 
 export default useForm;
